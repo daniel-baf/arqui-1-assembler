@@ -3,10 +3,11 @@
 ; fecha: 10 de marzo del 2023
 ; ultima actualización: 10 de marzo del 2023
 
-%include        'stdio32.asm'
+%include        'utils/stdio32.asm'
+%include        'utils/string.asm'
 
 SECTION         .data
-    msg_name        db      "Ingresa tu nombre: ", 0H
+    msg_name        db      "INGRESA TU NOMBRE: ", 0H
     msg_sec_nam     db      "Ingresa tu apellido: ", 0H
     msg_country     db      "Ingresa tu pais: ", 0H
     msg_final_1     db      "Hola, ", 0H
@@ -30,8 +31,10 @@ request_data:
 
     request_data_name:
         mov         eax, msg_name       ; imprime el mensaje de nombre
-        call        print
+        call        toLowerCase         ; txt.toLowerCase
+        call        print               ; imprime el mensaje
         call        readline            ; leemos el valor ingresado
+        call        toUpperCase         ; eax.toUpperCase
         ; copaimos el contenido de eax en in_name
         mov         esi, eax            ; esi -> buffer
         mov         edi, in_name        ; edi -> in_name
@@ -46,6 +49,7 @@ request_data:
         mov         eax, msg_sec_nam    ; imprime el mensaje de apellido
         call        print
         call        readline            ; leemos el valor ingresado
+        call        toUpperCase         ; eax.toUpperCase
         ; copaimos el contenido de eax en in_name
         mov         esi, eax            ; esi -> buffer
         mov         edi, in_sec_name    ; edi -> in_country
@@ -60,6 +64,7 @@ request_data:
         mov         eax, msg_country    ; imprime el mensaj de ciudad
         call        print
         call        readline            ; leemos el valor ingresado
+        call        toUpperCase         ; eax.toUpperCase
         ; copaimos el contenido de eax en in_name
         mov         esi, eax            ; esi -> buffer
         mov         edi, in_country     ; edi -> in_country
