@@ -1,9 +1,10 @@
-%include 'stdio32.asm'
+%include    '../utils/stdio32.asm'
+%include    ''
 
 SECTION .data
     msg_as_num      db          "El numero como numero es: ", 0H
     msg_as_str      db          "El numero como string es: ", 0H
-    str_num         db          "1234123", 0H
+    str_num         db          "541", 0H
 SECTION .bss
 SECTION .text
     global      _start
@@ -36,11 +37,10 @@ atoi:
     push        eax
 
     mov         ebx, eax                ; copy
-
-    call        println
-
-    call        strLen
-    call        iPrintLn
+    
+    call        strLen                  ; calculamos la potencia
+    dec         eax                     ; le restamos 1
+    mov         edx, eax                ; guardamos en d
     pop         eax
 
     .atoi_loop:
