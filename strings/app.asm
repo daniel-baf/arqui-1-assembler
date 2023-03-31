@@ -23,8 +23,16 @@ SECTION         .text
 
 
 _start:
-    call        request_data
+;    call        request_data
+    call        cast_data
     call        sys_exit
+
+cast_data:
+    mov         eax, msg_country
+    mov         ebx, msg_final_2
+    call        concat_str
+    call        println
+    ret
 
 request_data:
     push        ecx
