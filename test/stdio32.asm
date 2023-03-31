@@ -4,6 +4,8 @@
 ; fecha: 10 de marzo del 2023
 ; ultima actualización: 24 de marzo del 2023
 
+%include        'math-utils.asm'
+
 SECTION .data
 
 SECTION .bss

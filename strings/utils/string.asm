@@ -82,6 +82,11 @@ toLowerCase:
 ;               CONCAT STRING                ;
 ; ------------------------------------------ ;
 concat_str:
+    ; backup
+    push        ecx
+    push        esi
+    push        edi
+
     concat_str_copy_data:
         ; copaimos el contenido de eax en str_input_2
         mov         esi, eax            ; esi -> buffer
@@ -131,4 +136,9 @@ concat_str:
     rep         movsb
     
     mov         eax, str_concat
+
+    ; restore
+    pop         edi
+    pop         esi
+    pop         ecx
     ret
