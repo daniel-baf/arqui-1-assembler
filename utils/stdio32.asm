@@ -2,7 +2,7 @@
 ; estandar de la computadora
 ; creador: @daniel-baf
 ; fecha: 10 de marzo del 2023
-; ultima actualización: 10 de marzo del 2023
+; ultima actualización: 24 de marzo del 2023
 
 SECTION .data
 
@@ -124,3 +124,62 @@ readline:
 
     mov         eax, buffer                     ; devolvemos el valor en el buffer
     ret
+
+
+; ------------------------------------------ ;
+;       Impresion de numeros                 ;
+; ------------------------------------------ ;
+
+iPrintLn:
+    call        iPrint      ; imprimimos el numero
+    ; imprimimos el salto de linea
+    push        eax
+
+    mov         eax, 0AH    ;
+    push        eax
+    mov         eax, esp
+    call        print
+    pop         eax
+
+    pop         eax
+    ret                     ; regresamos a la funcion origen
+
+; imprime un numero entero que este en eax
+iPrint:
+    ; backup de los registros
+    push        eax
+    push        ecx
+    push        edx
+    push        esi
+
+    mov         ecx, 0      ; iniciamos el contador en 0
+    div_loop:
+        inc         ecx         ; conteo de digitos
+        mov         edx, 0      ; limpiar hsb de la division
+        mov         esi, 10     ; esi [divisor] = 10
+        idiv        esi         ; <edx:eax>/ esi
+        add         edx, 48     ; + 0 int incial
+        push        edx         ; residuo -> stack
+        cmp         eax, 0      
+        jnz         div_loop
+
+    ; fin div_loop
+    print_loop:
+        dec         ecx         ; decrementamos en la pila
+        mov         eax, esp    ;
+        call        print
+        pop         eax         ; residuo ecx = eax
+        cmp         ecx, 0      ; aun hay datos
+        jnz         print_loop  ; saltamos
+
+    ; restauramos valores
+    pop         esi
+    pop         edx
+    pop         ecx
+    pop         eax         ; 
+    ret                     ; regresamos
+
+
+; ------------------------------------------ ;
+;               FUNCION GOTO                 ;
+; ------------------------------------------ ;
