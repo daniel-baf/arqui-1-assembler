@@ -28,10 +28,15 @@ _start:
 ;    call        request_data
 ;    call        concat_text
 ;    call        print_num
-    call        goto_xy_func
+;    call        goto_xy_func
+    call        print_color_func
 
     call        sys_exit
 
+print_color_func:
+    mov         eax, msg_final_1
+    call        print_color
+    ret
 goto_xy_func:
     call        clear_screen
 
