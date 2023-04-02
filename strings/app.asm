@@ -3,8 +3,8 @@
 ; fecha: 10 de marzo del 2023
 ; ultima actualización: 10 de marzo del 2023
 
-%include        'utils/stdio32.asm'
-%include        'utils/string.asm'
+%include        '../utils/stdio32.asm'
+%include        '../utils/string.asm'
 
 SECTION         .data
     msg_name        db      "INGRESA TU NOMBRE: ", 0H
@@ -12,6 +12,7 @@ SECTION         .data
     msg_country     db      "Ingresa tu pais: ", 0H
     msg_final_1     db      "Hola, ", 0H
     msg_final_2     db      "! vives en ", 0H
+    msg_num         db      "Imrimpiendo con iPrint: ", 0H
 
 SECTION         .bss
     in_name:        resb    255
@@ -25,7 +26,16 @@ SECTION         .text
 _start:
 ;    call        request_data
 ;    call        concat_text
+    call        print_num
+
     call        sys_exit
+
+print_num:
+    mov         eax, msg_num
+    call        print
+    mov         eax, 21
+    call        iPrintLn
+    ret
 
 concat_text:
     mov         eax, msg_country
