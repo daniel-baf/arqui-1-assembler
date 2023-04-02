@@ -3,8 +3,8 @@
 ; fecha: 10 de marzo del 2023
 ; ultima actualización: 10 de marzo del 2023
 
-%include        '../utils/stdio32.asm'
-%include        '../utils/string.asm'
+%include        '../../utils/stdio32.asm'
+%include        '../../utils/string.asm'
 
 SECTION         .data
     msg_name        db      "INGRESA TU NOMBRE: ", 0H
