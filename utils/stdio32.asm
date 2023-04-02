@@ -5,6 +5,9 @@
 ; ultima actualización: 24 de marzo del 2023
 
 SECTION .data
+    ; variables usadas para goto_xy
+    clear_str		db	    1Bh, '[2J', 1Bh, '[3J', 0h
+	goto_xy_str	    db	    1Bh, '[01;01H', 0h
 
 SECTION .bss
     buffer:         resb        255
@@ -183,3 +186,33 @@ iPrint:
 ; ------------------------------------------ ;
 ;               FUNCION GOTO                 ;
 ; ------------------------------------------ ;
+clear_screen:
+	mov	        eax, clear_str
+	call	    print
+	ret
+
+; ah = x, al = y
+goto_xy:
+    mov	eax, goto_xy_str
+	mov	ebx, eax
+    .goto_xy_loop:
+        cmp	byte [ebx], 0       ; revisamos si es null
+    	jz	.goto_xy_loop_end
+    	cmp	byte [ebx], '['
+    	je	.goto_xy_set_x
+    	cmp	byte [ebx], ';'
+    	je	.goto_xy_set_y
+    	inc	ebx
+    	jmp	.goto_xy_loop
+    .goto_xy_set_y:
+	    add	ebx, 2
+	    mov	byte [ebx], dl
+	    jmp	.goto_xy_loop
+    .goto_xy_set_x:
+	    add	ebx, 2
+	    mov 	byte [ebx], dh
+	    jmp 	.goto_xy_loop
+    .goto_xy_loop_end:
+	    call	print
+	    int	80h
+    ret

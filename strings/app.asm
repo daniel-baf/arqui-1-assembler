@@ -13,6 +13,7 @@ SECTION         .data
     msg_final_1     db      "Hola, ", 0H
     msg_final_2     db      "! vives en ", 0H
     msg_num         db      "Imrimpiendo con iPrint: ", 0H
+    msg_goto        db      "Esto es un texto usando goto", 0H
 
 SECTION         .bss
     in_name:        resb    255
@@ -26,9 +27,21 @@ SECTION         .text
 _start:
 ;    call        request_data
 ;    call        concat_text
-    call        print_num
+;    call        print_num
+    call        goto_xy_func
 
     call        sys_exit
+
+goto_xy_func:
+    call        clear_screen
+
+    mov         dl, 57
+    mov         dh, 57
+    call        goto_xy
+
+    mov         eax, msg_goto
+    call        println
+    ret
 
 print_num:
     mov         eax, msg_num
