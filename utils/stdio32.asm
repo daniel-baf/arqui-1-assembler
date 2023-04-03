@@ -235,3 +235,89 @@ print_color:
     call        println
     pop         eax
     ret
+
+; ------------------------------------------ ;
+;                   CASTEOS                  ;
+; ------------------------------------------ ;
+
+; eax = number as string
+str_to_int:
+    .backup:
+        push        edx
+        push        ecx
+        push        ebx
+        push        esi
+
+    mov         ebx,0               ; acumulador
+    mov         esi, eax            ; esi -> *eax, cadena
+
+    .str_to_int_loop:
+        movzx   edx, byte[esi]      ; cargar en edx el siguiente byte del string en cl
+        cmp     dl, 0               ; fin de caneda?
+        je      .str_to_int_done
+
+    
+        sub     dl, 48              ; cl -= ASCII('0')
+        imul    ebx, 10             ; multiplica el acumulador por 10
+        add     ebx, edx            ; sumamos el valur numerico al acumulador
+
+        inc     esi                 ; continuamos el loop
+        jmp     .str_to_int_loop
+    .str_to_int_done:
+        mov     eax, ebx
+    
+    .restore:
+        pop     esi
+        pop     ebx
+        pop     ecx
+        pop     edx
+    ret
+
+; eax = number as number
+; EAX = value && EDI = buffer
+int_to_str:
+    .backup:
+        push        edx
+        push        ecx
+        push        edi
+        push        esi
+        push        eax
+
+    mov         ebx, 10         ; divisor de variables
+    mov         ecx, eax        ; ecx -> eax
+    pop         eax             ; stack.push
+;    call        strLen          ; longitud de cadena
+    ; add         ecx, eax        ; ecx = longitud
+    ; pop         eax             ; restaura texto
+
+    .compare:
+;        cmp         eax, 0          ; es null?
+;        jg          .convert         ; convierte si el valor es > 0
+;        mov         byte[ecx], 48   ; lo convierte en ASCII(0)
+;        jmp         .tmp_print       ; imprime el numero
+    
+    .convert:
+        ; divide eax por ebbx para obtener los digitos y los agrega a la cadena en orden inverso
+;        .loop:
+;            xor         edx, edx        ; lleva edx a la sig posicion
+;            div         ebx             ; eax/ebx
+;            add         dl, 48          ; edx = val + ASCII(0)
+;            dec         ecx             ; ecx-- loop
+;            mov         byte[ecx], dl   ; agrega el caracter a la cadena
+;            cmp         eax, 0          ; todos los digitos han sido leidos
+;            jg          .loop
+
+    .tmp_print:
+;        mov     eax, 1
+;        xor     ebx, ebx
+;        int     80h
+
+    .done:
+;        mov     eax, edx
+
+    .restore:
+        pop         esi
+        pop         edi
+        pop         ecx
+        pop         edx
+    ret
