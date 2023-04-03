@@ -5,6 +5,12 @@
 ; ultima actualización: 24 de marzo del 2023
 
 SECTION .data
+    ; variables usadas para goto_xy
+    clear_str		db	    1Bh, '[2J', 1Bh, '[3J', 0h
+	goto_xy_str	    db	    1Bh, '[01;01H', 0h
+    ; variables usadas para imprimir con colores en ensamblador
+    print_color_str_open    db      1BH, "[\x1b[31m", 0H ; cambia color
+    print_color_str_close   db      1BH,"\x1b[0m", 0H  ; reinicia el de color
 
 SECTION .bss
     buffer:         resb        255
@@ -28,13 +34,13 @@ strLen:
     push        ebx             ; guardamos su valor en pila
     mov         ebx, eax        ; eax = ebx | ebx = dir en memoria de eax
 
-    nextCharLenStrLen:
-        cmp         byte[eax], 0            ; msg[eax] == 0 ?
-        jz          nextCharLenStrLenEnd    ; GOTO nextCharLenStrLenEnd cuando no hayan mas chars
-        inc         eax                     ; eax++ para loop
-        jmp         nextCharLenStrLen       ; continua el loop
+    .next_char_len_strLen:
+        cmp         byte[eax], 0                ; msg[eax] == 0 ?
+        jz          .next_char_len_strLenEnd    ; GOTO .next_char_len_strLenEnd cuando no hayan mas chars
+        inc         eax                         ; eax++ para loop
+        jmp         .next_char_len_strLen       ; continua el loop
 
-    nextCharLenStrLenEnd:
+    .next_char_len_strLenEnd:
     sub         eax, ebx                    ; longitud de la cadena = eax - ebx
     pop         ebx                         ; recupera el valor de ebx
     ret                                     ; fin de funcion
@@ -183,3 +189,49 @@ iPrint:
 ; ------------------------------------------ ;
 ;               FUNCION GOTO                 ;
 ; ------------------------------------------ ;
+clear_screen:
+	mov	        eax, clear_str
+	call	    print
+	ret
+
+; ah = x, al = y
+goto_xy:
+    mov	eax, goto_xy_str
+	mov	ebx, eax
+    .goto_xy_loop:
+        cmp	byte [ebx], 0       ; revisamos si es null
+    	jz	.goto_xy_loop_end
+    	cmp	byte [ebx], '['
+    	je	.goto_xy_set_x
+    	cmp	byte [ebx], ';'
+    	je	.goto_xy_set_y
+    	inc	ebx
+    	jmp	.goto_xy_loop
+    .goto_xy_set_y:
+	    add	ebx, 2
+	    mov	byte [ebx], dl
+	    jmp	.goto_xy_loop
+    .goto_xy_set_x:
+	    add	ebx, 2
+	    mov 	byte [ebx], dh
+	    jmp 	.goto_xy_loop
+    .goto_xy_loop_end:
+	    call	print
+	    int	80h
+    ret
+
+; ------------------------------------------ ;
+;               IMPRIMIR CON COLORES         ;
+; ------------------------------------------ ;
+; imprime de color el valor que venga en eax
+print_color:
+    push        eax     ; recuperado al final
+    push        eax     ; usado en funcicon
+    mov         eax, print_color_str_open
+    call        print
+    pop         eax
+    call        print
+    mov         eax, print_color_str_close
+    call        println
+    pop         eax
+    ret
