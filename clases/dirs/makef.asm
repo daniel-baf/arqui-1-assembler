@@ -2,7 +2,7 @@
 ; creador: @daniel_baf
 ; fecha: 2023-03-31
 
-%include        '../utils/stdio32.asm'
+%include        '../../utils/stdio32.asm'
 
 SECTION .data
     filename        db          'read.txt', 0H
