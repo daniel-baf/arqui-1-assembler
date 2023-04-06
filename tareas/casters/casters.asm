@@ -35,6 +35,7 @@ cast_int_func:
     call        print
     mov         eax, [number]
     call        int_to_str
+    call        println
     ret
 
 
@@ -45,7 +46,7 @@ cast_string_func:
     mov         eax, str_number
     call        println
     ; castea el string
-    mov         eax, msg_str_number
+    mov         eax, msg_number
     call        print
     mov         eax, str_number
     call        str_to_int

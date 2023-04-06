@@ -25,11 +25,11 @@ SECTION         .text
 
 
 _start:
-;    call        request_data
-;    call        concat_text
-;    call        print_num
-;    call        goto_xy_func
+    call        request_data
+    call        concat_text
+    call        print_num
     call        print_color_func
+;    call        goto_xy_func
 
     call        sys_exit
 
