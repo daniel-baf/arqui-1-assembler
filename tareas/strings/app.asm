@@ -3,8 +3,8 @@
 ; fecha: 10 de marzo del 2023
 ; ultima actualización: 10 de marzo del 2023
 
-%include        '../utils/stdio32.asm'
-%include        '../utils/string.asm'
+%include        '../../utils/stdio32.asm'
+%include        '../../utils/string.asm'
 
 SECTION         .data
     msg_name        db      "INGRESA TU NOMBRE: ", 0H
@@ -12,6 +12,8 @@ SECTION         .data
     msg_country     db      "Ingresa tu pais: ", 0H
     msg_final_1     db      "Hola, ", 0H
     msg_final_2     db      "! vives en ", 0H
+    concat_1        db      "Esto ES unString", 0H
+    concat_2        db      " Concatenado usando toLower", 0H
     msg_num         db      "Imrimpiendo con iPrint: ", 0H
 
 SECTION         .bss
@@ -24,11 +26,18 @@ SECTION         .text
 
 
 _start:
-;    call        request_data
-;    call        concat_text
+    call        request_data
+    call        concat_text
     call        print_num
+    call        print_color_func
+;    call        goto_xy_func
 
     call        sys_exit
+
+print_color_func:
+    mov         eax, msg_final_1
+    call        print_color
+    ret
 
 print_num:
     mov         eax, msg_num
@@ -38,8 +47,8 @@ print_num:
     ret
 
 concat_text:
-    mov         eax, msg_country
-    mov         ebx, msg_final_2
+    mov         eax, concat_1
+    mov         ebx, concat_2
     call        concat_str
     call        println
     ret
