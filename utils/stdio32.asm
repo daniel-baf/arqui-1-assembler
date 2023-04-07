@@ -13,6 +13,7 @@ SECTION .data
     print_color_str_close   db      1BH,"\x1b[0m", 0H  ; reinicia el de color
     ; variables usadasa para castear de int a string
     numb_div_base           dd      10
+    msg_not_number          db      "El valor no contiene valores validos para numero", 0H
 
 SECTION .bss
     buffer:         resb        255
@@ -77,6 +78,7 @@ print:
     ret
 
 ; imprime una cadena con salto de linea
+; void print(String toPrint)
 println:
     call        print           ; imprime la cadena
 
@@ -191,6 +193,8 @@ iPrint:
 ; ------------------------------------------ ;
 ;               FUNCION GOTO                 ;
 ; ------------------------------------------ ;
+; system.clear()
+; print(cls)
 clear_screen:
 	mov	        eax, clear_str
 	call	    print
@@ -257,6 +261,10 @@ str_to_int:
         movzx   edx, byte[esi]      ; cargar en edx el siguiente byte del string en cl
         cmp     dl, 0               ; fin de caneda?
         je      .done
+        cmp     dl, 48              ; es menor a 0?
+        jl      .invalid
+        cmp     dl, 57              ; es mayor a 9?
+        jg      .invalid
 
     
         sub     dl, 48              ; cl -= ASCII('0')
@@ -265,6 +273,13 @@ str_to_int:
 
         inc     esi                 ; continuamos el loop
         jmp     .loop
+
+    .invalid:
+        push        eax
+        mov         eax, msg_not_number
+        call        println
+        pop         eax
+
     .done:
         mov     eax, ebx
     
@@ -332,3 +347,7 @@ int_to_str:
         pop         ecx
         pop         edx
     ret
+
+; ------------------------------------------ ;
+;                   EXTRAS                   ;
+; ------------------------------------------ ;
