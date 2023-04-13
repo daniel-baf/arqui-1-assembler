@@ -11,6 +11,9 @@ SECTION .data
     ; variables usadas para imprimir con colores en ensamblador
     print_color_str_open    db      1BH, "[\x1b[31m", 0H ; cambia color
     print_color_str_close   db      1BH,"\x1b[0m", 0H  ; reinicia el de color
+    ; variables usadasa para castear de int a string
+    numb_div_base           dd      10
+    msg_not_number          db      "El valor no contiene valores validos para numero", 0H
 
 SECTION .bss
     buffer:         resb        255
@@ -34,13 +37,13 @@ strLen:
     push        ebx             ; guardamos su valor en pila
     mov         ebx, eax        ; eax = ebx | ebx = dir en memoria de eax
 
-    .next_char_len_strLen:
-        cmp         byte[eax], 0                ; msg[eax] == 0 ?
-        jz          .next_char_len_strLenEnd    ; GOTO .next_char_len_strLenEnd cuando no hayan mas chars
-        inc         eax                         ; eax++ para loop
-        jmp         .next_char_len_strLen       ; continua el loop
+    .next_char:
+        cmp         byte[eax], 0            ; msg[eax] == 0 ?
+        jz          .next_char_end          ; GOTO .next_char_end cuando no hayan mas chars
+        inc         eax                     ; eax++ para loop
+        jmp         .next_char              ; continua el loop
 
-    .next_char_len_strLenEnd:
+    .next_char_end:
     sub         eax, ebx                    ; longitud de la cadena = eax - ebx
     pop         ebx                         ; recupera el valor de ebx
     ret                                     ; fin de funcion
@@ -75,6 +78,7 @@ print:
     ret
 
 ; imprime una cadena con salto de linea
+; void print(String toPrint)
 println:
     call        print           ; imprime la cadena
 
@@ -109,17 +113,17 @@ readline:
 
     ; Busca el salto de línea en el buffer
     push        edi
-    mov         edi, ecx        ; edi = dirección del buffer
-    mov         ecx, eax        ; ecx = número de caracteres leídos
-    xor         eax, eax        ; eax = contador de caracteres
-    cld                         ; Dirección ascendente para repne scasb
-    repne       scasb           ; Busca el salto de línea
-    je          reemplzar_salto  ; Si se encontró el salto de línea, reemplaza con null byte
+    mov         edi, ecx            ; edi = dirección del buffer
+    mov         ecx, eax            ; ecx = número de caracteres leídos
+    xor         eax, eax            ; eax = contador de caracteres
+    cld                             ; Dirección ascendente para repne scasb
+    repne       scasb               ; Busca el salto de línea
+    je          .replace_jumpline  ; Si se encontró el salto de línea, reemplaza con null byte
 
     ; Si no se encuentra el salto de línea, agrega un valor nulo al final de la entrada del usuario
     mov         byte [edi + ecx], 0H
 
-    reemplzar_salto:
+    .replace_jumpline:
         mov         byte [edi + eax - 1], 0H     ; Reemplaza el salto de línea con null byte
 
     ; retornamos los vlores originales
@@ -159,7 +163,7 @@ iPrint:
     push        esi
 
     mov         ecx, 0      ; iniciamos el contador en 0
-    div_loop:
+    .div_loop:
         inc         ecx         ; conteo de digitos
         mov         edx, 0      ; limpiar hsb de la division
         mov         esi, 10     ; esi [divisor] = 10
@@ -167,16 +171,16 @@ iPrint:
         add         edx, 48     ; + 0 int incial
         push        edx         ; residuo -> stack
         cmp         eax, 0      
-        jnz         div_loop
+        jnz         .div_loop
 
-    ; fin div_loop
-    print_loop:
+    ; fin .div_loop
+    .print_loop:
         dec         ecx         ; decrementamos en la pila
         mov         eax, esp    ;
         call        print
         pop         eax         ; residuo ecx = eax
         cmp         ecx, 0      ; aun hay datos
-        jnz         print_loop  ; saltamos
+        jnz         .print_loop ; saltamos
 
     ; restauramos valores
     pop         esi
@@ -189,6 +193,8 @@ iPrint:
 ; ------------------------------------------ ;
 ;               FUNCION GOTO                 ;
 ; ------------------------------------------ ;
+; system.clear()
+; print(cls)
 clear_screen:
 	mov	        eax, clear_str
 	call	    print
@@ -251,10 +257,14 @@ str_to_int:
     mov         ebx,0               ; acumulador
     mov         esi, eax            ; esi -> *eax, cadena
 
-    .str_to_int_loop:
+    .loop:
         movzx   edx, byte[esi]      ; cargar en edx el siguiente byte del string en cl
         cmp     dl, 0               ; fin de caneda?
-        je      .str_to_int_done
+        je      .done
+        cmp     dl, 48              ; es menor a 0?
+        jl      .invalid
+        cmp     dl, 57              ; es mayor a 9?
+        jg      .invalid
 
     
         sub     dl, 48              ; cl -= ASCII('0')
@@ -262,8 +272,15 @@ str_to_int:
         add     ebx, edx            ; sumamos el valur numerico al acumulador
 
         inc     esi                 ; continuamos el loop
-        jmp     .str_to_int_loop
-    .str_to_int_done:
+        jmp     .loop
+
+    .invalid:
+        push        eax
+        mov         eax, msg_not_number
+        call        println
+        pop         eax
+
+    .done:
         mov     eax, ebx
     
     .restore:
@@ -273,51 +290,64 @@ str_to_int:
         pop     edx
     ret
 
-; eax = number as number
-; EAX = value && EDI = buffer
+; eax = number as number -> eax as string
 int_to_str:
     .backup:
         push        edx
         push        ecx
-        push        edi
+        push        ebx
         push        esi
-        push        eax
+    .start:
+        mov         esi, buffer     ; guardamos los valores en el buffer
+        xor         ecx, ecx        ; reiniciamos el contador
+        
+        .loop:
+            cmp         eax, 0          ; numeros terminados
+            jle         .invert         ; termina bucle
 
-    mov         ebx, 10         ; divisor de variables
-    mov         ecx, eax        ; ecx -> eax
-    pop         eax             ; stack.push
-;    call        strLen          ; longitud de cadena
-    ; add         ecx, eax        ; ecx = longitud
-    ; pop         eax             ; restaura texto
+            xor         edx, edx        ; borramos el valor de la division
 
-    .compare:
-;        cmp         eax, 0          ; es null?
-;        jg          .convert         ; convierte si el valor es > 0
-;        mov         byte[ecx], 48   ; lo convierte en ASCII(0)
-;        jmp         .tmp_print       ; imprime el numero
-    
-    .convert:
-        ; divide eax por ebbx para obtener los digitos y los agrega a la cadena en orden inverso
-;        .loop:
-;            xor         edx, edx        ; lleva edx a la sig posicion
-;            div         ebx             ; eax/ebx
-;            add         dl, 48          ; edx = val + ASCII(0)
-;            dec         ecx             ; ecx-- loop
-;            mov         byte[ecx], dl   ; agrega el caracter a la cadena
-;            cmp         eax, 0          ; todos los digitos han sido leidos
-;            jg          .loop
+            mov         ebx, [numb_div_base]
+            div         ebx
 
-    .tmp_print:
-;        mov     eax, 1
-;        xor     ebx, ebx
-;        int     80h
+            .positionate:
+                add         dl, 48
+                mov         byte[esi], dl
+                inc         esi
 
-    .done:
-;        mov     eax, edx
+            jmp         .loop
+        .invert:
+            push        esi
+            .calclen:   ; calculamos la longitud de la cadena
+                mov         eax, buffer
+                call        strLen
+                mov         edi, eax            ; edx = longitud de cadena
+
+            mov         esi, buffer         ; -> apunta al inicio de la cadena
+            lea         edi, [esi+edi-1]    ; apunta al final de la cadena
+            
+            .loopi:
+                mov         al, [esi]       ; carga el primer caracter
+                xchg        al, [edi]       ; intercambia el primer y ultimo valor
+                mov         [esi], al       ; guarda el caracter en el ulitmo lugar
+                inc         esi
+                dec         edi
+                cmp         esi, edi
+                jl          .loopi
+                
+
+        .end:
+            pop         esi
+            mov         byte[esi], 0H       ; la cadena termina en null
+            mov         eax, buffer         ; eax -> buffer
 
     .restore:
         pop         esi
-        pop         edi
+        pop         ebx
         pop         ecx
         pop         edx
     ret
+
+; ------------------------------------------ ;
+;                   EXTRAS                   ;
+; ------------------------------------------ ;

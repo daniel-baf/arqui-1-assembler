@@ -12,8 +12,9 @@ SECTION         .data
     msg_country     db      "Ingresa tu pais: ", 0H
     msg_final_1     db      "Hola, ", 0H
     msg_final_2     db      "! vives en ", 0H
+    concat_1        db      "Esto ES unString", 0H
+    concat_2        db      " Concatenado usando toLower", 0H
     msg_num         db      "Imrimpiendo con iPrint: ", 0H
-    msg_goto        db      "Esto es un texto usando goto", 0H
 
 SECTION         .bss
     in_name:        resb    255
@@ -25,27 +26,17 @@ SECTION         .text
 
 
 _start:
-;    call        request_data
-;    call        concat_text
-;    call        print_num
-;    call        goto_xy_func
+    call        request_data
+    call        concat_text
+    call        print_num
     call        print_color_func
+;    call        goto_xy_func
 
     call        sys_exit
 
 print_color_func:
     mov         eax, msg_final_1
     call        print_color
-    ret
-goto_xy_func:
-    call        clear_screen
-
-    mov         dl, 57
-    mov         dh, 57
-    call        goto_xy
-
-    mov         eax, msg_goto
-    call        println
     ret
 
 print_num:
@@ -56,8 +47,8 @@ print_num:
     ret
 
 concat_text:
-    mov         eax, msg_country
-    mov         ebx, msg_final_2
+    mov         eax, concat_1
+    mov         ebx, concat_2
     call        concat_str
     call        println
     ret
