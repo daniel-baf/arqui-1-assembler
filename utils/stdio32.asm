@@ -261,11 +261,11 @@ str_to_int:
         movzx   edx, byte[esi]      ; cargar en edx el siguiente byte del string en cl
         cmp     dl, 0               ; fin de caneda?
         je      .done
+
         cmp     dl, 48              ; es menor a 0?
         jl      .invalid
         cmp     dl, 57              ; es mayor a 9?
         jg      .invalid
-
     
         sub     dl, 48              ; cl -= ASCII('0')
         imul    ebx, 10             ; multiplica el acumulador por 10
