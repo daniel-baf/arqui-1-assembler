@@ -31,9 +31,7 @@ _start:
         je      .pow_end
 
         ; multiply
-        mov     ebx, [base]
-        mov     eax, eax
-        imul    eax, ebx                   ; genera la multiplicacion
+        imul    eax, [base]                   ; genera la multiplicacion
 
         ; loop
         dec     ecx
