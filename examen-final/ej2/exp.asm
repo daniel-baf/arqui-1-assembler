@@ -25,18 +25,22 @@ _start:
     mov     ecx, eax    ; ecx = pow
 
     ; loop throug pow
+    mov     eax,[base]
     .pow_loop:
         cmp     ecx, 1
         je      .pow_end
 
         ; multiply
-        mov     eax, ecx
-        call    iPrintLn
+        mov     ebx, [base]
+        mov     eax, eax
+        imul    eax, ebx                   ; genera la multiplicacion
 
         ; loop
         dec     ecx
         jmp     .pow_loop
     .pow_end:
+
+    call        iPrintLn
 
     .exit:
         call        sys_exit
