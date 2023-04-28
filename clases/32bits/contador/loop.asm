@@ -3,7 +3,7 @@
 ; Fecha: 2023-03-17
 ; Programa que realiza impresion de valores del 0 al 9 en pantalla, implementando las funciones intToStr y strToInt
 
-%include    '../../utils/stdio32.asm'
+%include    '../../../utils/stdio32.asm'
 
 SECTION .data
     msg         dw      'esto ', 0H

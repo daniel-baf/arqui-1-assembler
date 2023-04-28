@@ -2,7 +2,11 @@
 ; creador: @daniel_baf
 ; fecha: 2023-03-31
 
+<<<<<<<< HEAD:clases/dirs/makef/makef.asm
+%include        '../../../utils/stdio32.asm'
+========
 %include        '../../../../utils/stdio32.asm'
+>>>>>>>> dev:clases/32bits/dirs/makef/makef.asm
 
 SECTION .data
     filename        db          'read.txt', 0H

@@ -3,7 +3,7 @@
 ; fecha: 2023/03/15
 ; Ingreso de datos y almacenamiento en memoria para impresion en pantalla
 
-%include '../../utils/stdio32.asm'
+%include '../../../utils/stdio32.asm'
 
 SECTION .data
     msg1    db      'Por favor, ingrese su nombre: ', 0H

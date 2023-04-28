@@ -1,0 +1,53 @@
+     1                                  ; Manejo de valores de coma flotante
+     2                                  ; creador: abemen
+     3                                  ; fecha: 21/04/2023
+     4                                  ; compilar: nasm -f elf64 flotante.asm -l flotante.lst
+     5                                  ; link:	gcc -m64 flotante.o -o flotante -no-pie
+     6                                  
+     7                                  extern	printf
+     8                                  
+     9                                  SECTION	.data
+    10 00000000 6666666666661640        	base:		dq		5.6
+    11 00000008 3333333333330340        	height:		dq		2.4
+    12 00000010 0000000000000040        	base2:		dq		2.0
+    13 00000018 415245413A20282566-     	format:		db	"AREA: (%f * %f) / 2 = %f", 10, 0
+    13 00000021 202A20256629202F20-
+    13 0000002A 32203D2025660A00   
+    14                                  
+    15                                  SECTION	.bss
+    16 00000000 ????????????????        	result:		resq	1
+    17                                  
+    18                                  SECTION	.text
+    19                                  
+    20                                  	global	main
+    21                                  
+    22                                  main:
+    23                                  	; mult
+    24 00000000 55                      	push	rbp
+    25 00000001 DD0425[00000000]        	fld		qword [base]			;carga el radio al registro ST0
+    26 00000008 DC0C25[08000000]        	fmul	qword [height]			;radio * pi
+    27 0000000F DD1C25[00000000]        	fstp	qword [result]			;guarda el resultado en el registro ST0
+    28                                  
+    29                                  	; div
+    30 00000016 DD0425[00000000]        	fld		qword [result]			;carga el radio al registro ST0
+    31 0000001D DC3425[10000000]        	fdiv	qword [base2]			;radio * pi
+    32 00000024 DD1C25[00000000]        	fstp	qword [result]			;guarda el resultado en el registro ST0
+    33                                  
+    34 0000002B 48BF-                   	mov		rdi,format				;cadena con formato de impresion
+    34 0000002D [1800000000000000] 
+    35 00000035 F30F7E0425-             	movq	xmm0, qword [base]		;1er. parametro de coma flotante pi
+    35 0000003A [00000000]         
+    36 0000003E F30F7E0C25-             	movq	xmm1, qword [height]	;2o. parametro de coma flotante radio
+    36 00000043 [08000000]         
+    37 00000047 F30F7E1425-             	movq	xmm2, qword [result]	;3er. parametro de coma flotante C
+    37 0000004C [00000000]         
+    38 00000050 B803000000              	mov		rax, 3					;numero de parametros de coma flotante
+    39                                  
+    40 00000055 E8(00000000)            	call	printf
+    41                                  
+    42 0000005A 5D                      	pop		rbp
+    43                                  
+    44                                  
+    45 0000005B B801000000              	mov	rax, 1
+    46 00000060 4831DB                  	xor	rbx, rbx
+    47 00000063 CD80                    	int	80h

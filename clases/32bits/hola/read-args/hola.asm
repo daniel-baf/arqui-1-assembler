@@ -3,7 +3,7 @@
 ; fecha: 2023/03/15
 ; Impresion en pantalla con argumentos enviados
 
-%include '../../../utils/stdio32.asm'
+%include '../../../../utils/stdio32.asm'
 
 SECTION .text
     global _start

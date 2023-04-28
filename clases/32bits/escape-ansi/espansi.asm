@@ -3,7 +3,7 @@
 ; fecha: 2023-03-29
 ; imprime un mensaje contrado en pantalla
 
-%include '../../utils/stdio32.asm'
+%include '../../../utils/stdio32.asm'
 
 SECTION .data
     msg     db      'Arquitectura 2!!', 0H

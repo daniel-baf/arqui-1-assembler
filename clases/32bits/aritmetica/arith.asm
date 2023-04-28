@@ -2,7 +2,7 @@
 ; creador: Josue Maldonado
 ; fecha: 24/03/2023
 
-%include '../../utils/stdio32.asm'
+%include '../../../utils/stdio32.asm'
 
 SECTIOn .data
 	suma	db	'Suma: 90 + 9: ',0h

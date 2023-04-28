@@ -3,7 +3,7 @@
 ; fecha: 2023-03-30
 ; llamada a funciones de sistema
 
-%include        '../../utils/stdio32.asm'
+%include        '../../../utils/stdio32.asm'
 
 
 SECTION         .data

@@ -3,18 +3,22 @@
 ; fecha: 2023-03-30
 ; llamada a funciones de sistema
 
-%include        '../../utils/stdio32.asm'
+%include        '../../../utils/stdio32.asm'
 
 
 SECTION         .data
     command         db          "/bin/echo", 0H             ; comando a ejecutar
-    msg             db          "hola arquitectura 1", 0H   ; mensaje a desplegar
+    format          db          "-e", 0H                    ; format
+    env1            db          "$PATH", 0H
+    msg             db          "tu path es: ", 0H
 
     ; crear lista de argumentos de estructura
     args            dd          command
-                    dd          msg
+                    dd          format
+                    dd          env1
                     dd          0H      ; null
-    enviroment      dd          0H
+    enviroment      dd          env1
+                    dd          0H
 
 SECTION         .text
     global      _start
